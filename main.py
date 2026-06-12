@@ -54,8 +54,8 @@ def build_embed():
     embed = discord.Embed(
         title="🚛 inf lista",
         description=(
-            f"**⏰ Join window:** :{str(START_MINUTE).zfill(2)} — :{str(END_MINUTE).zfill(2)}\n"
-            f"**👥 Slots:** First {MAX_SLOTS} to click **Udi na listu**\n"
+            f"**⏰ Duration:** :{str(START_MINUTE).zfill(2)} — :{str(END_MINUTE).zfill(2)}\n"
+            f"**👥 First {MAX_SLOTS} are on the list, priority roles have advantage**\n"
             f"**🏆 Prize:** Random winner drives the Ammo Car\n"
             f"**📊 Status:** {status}\n\n"
             f"**Participants ({len(current_participants)}/{MAX_SLOTS}):**\n"
