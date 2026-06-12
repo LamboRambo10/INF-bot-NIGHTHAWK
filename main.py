@@ -227,7 +227,7 @@ async def event_scheduler():
             winner_id = random.choice(current_participants)
             winner = bot.get_user(winner_id)
             winner_mention = winner.mention if winner else f"<@{winner_id}>"
-            await channel.send(f"🎲 **EVENT CLOSED!** The random winner is... {winner_mention} 🎉\n🚗💨 **{winner_mention} drives the AMMO CAR!** 💣🔥")
+            await channel.send(f"🎲 **EVENT CLOSED!** The random winner is... {winner_mention} 🎉\n🚗💨 **Ammo car vozi {winner_mention}!** 🚗💨")
 
         event_active = False
         join_button_locked = False
