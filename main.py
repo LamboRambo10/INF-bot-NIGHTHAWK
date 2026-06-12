@@ -400,6 +400,7 @@ async def clear_priority_role(ctx):
 
 
 @bot.command(name="helpinf")
+@commands.cooldown(1, 5, commands.BucketType.user)
 @commands.has_permissions(administrator=True)
 async def help_command(ctx):
     priority_status = "nije postavljen"
