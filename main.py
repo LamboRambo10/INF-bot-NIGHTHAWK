@@ -20,11 +20,13 @@ TIMEZONE = pytz.timezone('Europe/Zagreb')
 # ==========================================
 MAX_SLOTS = 10
 START_MINUTE = 25
+WINNER_MINUTE = 35
 END_MINUTE = 40
 PRIORITY_ROLE_ID = None
 current_participants = []
 event_active = False
 join_button_locked = False
+winner_picked = False
 current_event_message = None
 
 intents = discord.Intents.default()
@@ -60,7 +62,7 @@ def build_embed():
             f"**📊 Status:** {status}\n\n"
             f"**Participants ({len(current_participants)}/{MAX_SLOTS}):**\n"
             f"{participant_text}\n\n"
-            f"*Event locks at :{str(END_MINUTE).zfill(2)}, winner picked immediately*"
+            f\"*Winner announced at :{str(WINNER_MINUTE).zfill(2)}, list locks at :{str(END_MINUTE).zfill(2)}*\""
         ),
         color=0xFF5500
     )
@@ -130,7 +132,7 @@ class JoinButtonView(discord.ui.View):
                 await update_message()
                 ch = bot.get_channel(CHANNEL_ID)
                 if ch:
-                    await ch.send(f"🔒 **{MAX_SLOTS} igrača! Lista zaključana. Pobjednik se izvlači u :{str(END_MINUTE).zfill(2)}.**")
+                    await ch.send(f\"🔒 **{MAX_SLOTS} igrača! Lista zaključana. Pobjednik se izvlači u :{str(WINNER_MINUTE).zfill(2)}.**\")
 
         except Exception as e:
             print(f"❌ Greška u join_callback: {e}")
@@ -183,7 +185,7 @@ async def update_message():
 # ==========================================
 @tasks.loop(minutes=1)
 async def event_scheduler():
-    global event_active, join_button_locked, current_participants, current_event_message
+    global event_active, join_button_locked, winner_picked, current_participants, current_event_message
 
     now = datetime.now(TIMEZONE)
     minute = now.minute
@@ -199,6 +201,7 @@ async def event_scheduler():
     if minute == START_MINUTE and not event_active:
         event_active = True
         join_button_locked = False
+        winner_picked = False
         current_participants = []
 
         channel = bot.get_channel(CHANNEL_ID)
@@ -213,12 +216,9 @@ async def event_scheduler():
         await channel.send("🚨 INF lista je pocela! Prvih 10 ulazi, bira se ko vozi AMMO CAR! 🚛")
         print(f"✅ Event started at {now.strftime('%H:%M')}")
 
-    # LOCK & DRAW AT CONFIGURED MINUTE
-    if minute == END_MINUTE and event_active:
-        if not join_button_locked:
-            join_button_locked = True
-            await update_message()
-
+    # PICK WINNER AT WINNER_MINUTE (:35)
+    if minute == WINNER_MINUTE and event_active and not winner_picked:
+        winner_picked = True
         channel = bot.get_channel(CHANNEL_ID)
 
         if len(current_participants) == 0:
@@ -229,9 +229,12 @@ async def event_scheduler():
             winner_mention = winner.mention if winner else f"<@{winner_id}>"
             await channel.send(f"🎲 **EVENT CLOSED!** The random winner is... {winner_mention} 🎉\n🚗💨 **Ammo car vozi {winner_mention}!** 🚗💨")
 
-        event_active = False
-        join_button_locked = False
-        current_participants = []
+        print(f"🎲 Winner picked at {now.strftime('%H:%M')}")
+
+    # LOCK LIST AT END_MINUTE (:40)
+    if minute == END_MINUTE and event_active:
+        join_button_locked = True
+        await update_message()
 
         if current_event_message:
             old_view = discord.ui.View.from_message(current_event_message)
@@ -239,6 +242,11 @@ async def event_scheduler():
                 child.disabled = True
             await current_event_message.edit(view=old_view)
             current_event_message = None
+
+        event_active = False
+        join_button_locked = False
+        winner_picked = False
+        current_participants = []
 
         print(f"🏁 Event finished at {now.strftime('%H:%M')}")
 
