@@ -421,7 +421,7 @@ async def help_command(ctx):
     embed.add_field(name="!set_priority_role @Rol", value=f"Postavlja rol koji ima prednost — izbacuje zadnjeg bez njega kad je lista puna.\nTrenutno: **{priority_status}**", inline=False)
     embed.add_field(name="!clear_priority_role", value="Uklanja priority rol.", inline=False)
     embed.set_footer(text="Sve komande su admin only.")
-    await ctx.send(embed=embed)
+    await ctx.send(embed=embed, ephemeral=True)
 
 
 @bot.command(name="set_time")
