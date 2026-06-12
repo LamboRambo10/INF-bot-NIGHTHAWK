@@ -210,7 +210,7 @@ async def event_scheduler():
         view = JoinButtonView()
         msg = await channel.send(embed=embed, view=view)
         current_event_message = msg
-        await channel.send("🚨 **AMMO CAR EVENT STARTED!** Click the button below. First 10 get a chance to win the Ammo Car! 🚛")
+        await channel.send("🚨 INF lista je pocela! Prvih 10 ulazi, bira se ko vozi AMMO CAR! 🚛")
         print(f"✅ Event started at {now.strftime('%H:%M')}")
 
     # LOCK & DRAW AT CONFIGURED MINUTE
